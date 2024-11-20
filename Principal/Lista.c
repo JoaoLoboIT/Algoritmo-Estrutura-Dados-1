@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct // pode ficar sem nome aqui?
+typedef struct 
 {
     int codigo;
     int quantidade;
@@ -12,7 +12,7 @@ typedef struct // pode ficar sem nome aqui?
 
 } TProduto;
 
-typedef struct celula // aqui tem nome por ex
+typedef struct celula 
 {
     TProduto item;
     struct celula *prox;
@@ -126,7 +126,7 @@ void Imprimir(TLista Lista)
     Aux = Lista.primeiro->prox;
     while (Aux != NULL)
     {
-        ImprimirProduto(Aux->item); // printf("%d\n", Aux ->item.codigo);
+        ImprimirProduto(Aux->item); 
         Aux = Aux->prox;
     }
 }
@@ -145,17 +145,17 @@ void LiberarLista(TLista *Lista)
 }
 
 void LiberarLista2(TLista *Lista)
-{ // ta certo ?
+{ 
     while (!Vazia(*Lista))
     {
         Excluir(Lista, &Lista->primeiro->prox->item);
     }
-    free(Lista->primeiro); // exclui a cabeça
+    free(Lista->primeiro); 
     Lista->primeiro = NULL;
 }
 
 TCelula *PesquisarPorNome(TLista Lista, TProduto Item)
-{ // TCelula* ou *PesquisarPorNome
+{
 
     TCelula *Aux;
     Aux = Lista.primeiro->prox;
@@ -178,7 +178,7 @@ void Atualizar(TLista *Lista, TProduto Item)
     {
         printf("\nProduto encontrado! Digite os novos dados:\n");
         LerProduto(&Item);
-        Aux->item = Item;
+        Aux->prox->item = Item;
         printf("\nProduto atualizado com sucesso!\n");
     }
     else
@@ -187,15 +187,9 @@ void Atualizar(TLista *Lista, TProduto Item)
     }
 }
 
-void InsereEmOrdemCrescente(TLista *Lista, TProduto Item)
+void InsereCrescente(TLista *Lista, TProduto Item)
 {
-
-    TCelula *novo;
-    TCelula *Aux1;
-    Aux1 = Lista->primeiro;
-    // Aux2 = Lista->primeiro->prox;
-
-    if (Vazia(*Lista) == 1)
+    if (Vazia(*Lista))
     {
         Inserir(Item, Lista);
     }
@@ -205,20 +199,28 @@ void InsereEmOrdemCrescente(TLista *Lista, TProduto Item)
     }
     else
     {
-        int resultado = strcmp(Item.nome, Aux1->prox->item.nome);
-        while (strcmp(Item.nome, Aux1->prox->item.nome) > 0)
+        TCelula *aux;
+        int flag = 0;
+        aux = Lista->primeiro;
+        while (!Vazia(*Lista))
         {
-            Aux1 = Aux1->prox;
-            resultado = strcmp(Aux1->prox->item.nome, Item.nome);
+            if (strcmp(Item.nome, aux->item.nome) > 0 && strcmp(Item.nome, aux->prox->item.nome) < 0)
+            {
+                TCelula *novo = (TCelula *)malloc(sizeof(TCelula));
+                novo->item = Item;
+                novo->prox = aux->prox;
+                aux->prox = novo;
+                flag = 1;
+                Lista->tamanho++;
+            }
+            if (flag == 1)
+            {
+                return;
+            }
+            aux = aux->prox;
         }
-        novo = (TCelula *)malloc(sizeof(TCelula));
-        novo->item = Item;
-        novo->prox = Aux1->prox;
-        Aux1->prox = novo;
     }
-    Lista->tamanho++;
 }
-
 void verificaDuasLista(TLista *Lista1, TLista *Lista2)
 {
     if (Lista1->tamanho == Lista2->tamanho)
@@ -249,6 +251,37 @@ void verificaDuasLista(TLista *Lista1, TLista *Lista2)
     else
     {
         printf("\nAs listas são diferentes\n");
+    }
+}
+
+
+int verficaIgualdade(TLista l1, TLista l2)
+{
+    if (l1.tamanho == l2.tamanho)
+    {
+        TCelula *aux;
+        int cont = 0;
+        aux = l1.primeiro;
+        while (aux != NULL)
+        {
+            if (PesquisarPorNome(l2, aux->item) != NULL)
+            {
+                cont++;
+            }
+            aux = aux->prox;
+        }
+        if (cont == l1.tamanho)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return 0;
     }
 }
 
@@ -294,21 +327,46 @@ void excluiIesima(TLista *Lista, int i)
     Excluir(Lista, &x);
 }
 
-void recursiva(TCelula *celula) {
-    if (celula != NULL) {
+void concatenaDuasListas2(TLista* l1, TLista* l2){
+    TCelula* aux = l2->primeiro->prox;
+    while(aux != NULL){
+        Inserir(aux->item, l1);
+        aux = aux->prox;
+    }
+    Imprimir(*l1);
+}
+
+void recursiva(TCelula *celula)
+{
+    if (celula != NULL)
+    {
         ImprimirProduto(celula->item);
         recursiva(celula->prox);
     }
 }
 
+void imprimeIesima2(TLista l1, int i){
+    TCelula* aux = l1.primeiro->prox;
+    for(int j = 1; j < i; j++){
+        aux = aux->prox;
+    }
+    ImprimirProduto(aux->item);
+}
 
-// void Inserir(TProduto x, TLista *Lista){
-//     Lista -> ultimo -> prox =(TCelula *) malloc(sizeof(TCelula));
-//     Lista -> ultimo = Lista -> ultimo -> prox;
-//     Lista -> ultimo -> item = x ;
-//     Lista -> ultimo -> prox = NULL;
-//     Lista -> tamanho++;
-// }
+void excluiIesima2(TLista* l1, int i){
+    TCelula* aux = l1->primeiro->prox;
+    for(int j = 1; j < i; j++){
+        aux = aux->prox;
+    }
+    Excluir(l1, &aux->item);
+}
+
+void recursiva2(TCelula* x){
+    if(x !=NULL){
+        ImprimirProduto(x->item);
+        recursiva2(x->prox);
+    }
+}
 
 int main()
 {
@@ -486,7 +544,8 @@ int main()
 
         case 6:
             printf("\nComparando as duas listas...\n");
-            verificaDuasLista(&L1, &L2);
+            int r = verficaIgualdade(L1, L2);
+            printf("%d ", r);
             break;
 
         case 7:
@@ -500,11 +559,11 @@ int main()
                 LerProduto(&prod);
                 if (L == 1)
                 {
-                    InsereEmOrdemCrescente(&L1, prod);
+                    InsereCrescente(&L1, prod);
                 }
                 else
                 {
-                    InsereEmOrdemCrescente(&L2, prod);
+                    InsereCrescente(&L2, prod);
                 }
             }
             else
@@ -517,11 +576,12 @@ int main()
         case 8:
             printf("Escolha a lista (1 para L1, 2 para L2): ");
             scanf("%d", &L);
+            getchar();
             if (L == 1)
             {
                 if (L1.inicializada)
                 {
-                    printf("Digite o código do produto que deseja atualizar: "); // fgets?
+                    printf("Digite o nome do produto que deseja atualizar: "); // fgets?
                     scanf("%c", &x.nome);
                     Atualizar(&L1, x);
                 }
@@ -551,7 +611,7 @@ int main()
 
         case 9:
             printf("Concatenando...");
-            concatenaDuasLista(&L1, &L2);
+            concatenaDuasListas2(&L1, &L2);
 
             break;
 
@@ -563,7 +623,7 @@ int main()
             scanf("%d", &i);
             if (L == 1)
             {
-                printaIesima(&L1, i);
+                imprimeIesima2(L1, i);
             }
             else if (L == 2)
             {
@@ -595,7 +655,7 @@ int main()
             break;
 
         case 12:
-            // recursiva(X);
+            recursiva(L1.primeiro->prox);
             break;
 
         case 13:
